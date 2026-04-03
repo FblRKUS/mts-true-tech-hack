@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mts_agentic_app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    volumes:
+      - ./app:/app/app
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - mts_network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: mts_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mts_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mts_password}
+      POSTGRES_DB: ${POSTGRES_DB:-mts_agentic_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mts_user}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mts_network
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: mts_qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+    networks:
+      - mts_network
+
+volumes:
+  postgres_data:
+  qdrant_data:
+
+networks:
+  mts_network:
+    driver: bridge
