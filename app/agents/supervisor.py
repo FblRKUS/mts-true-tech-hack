@@ -44,7 +44,18 @@ Current state:
 - Backend files: {list(state.get('backend_code', {}).keys())}
 - DevOps files: {list(state.get('devops_configs', {}).keys())}
 - QA iteration: {state.get('qa_iteration', 0)}/{settings.max_qa_iterations}
+- QA feedback status: {'Empty (patches applied)' if not state.get('qa_feedback') else 'Has feedback'}
 - Recent QA feedback: {state.get('qa_feedback', [])[-1] if state.get('qa_feedback') else 'None'}
+
+CRITICAL ROUTING RULES:
+1. If a developer (frontend_dev, backend_dev, devops) just completed work:
+   - Check if qa_feedback is NOW EMPTY (meaning patches were applied)
+   - If empty AND qa_iteration < max: Send to qa_tester to verify fixes
+   - This prevents infinite loops where devs keep getting sent the same task
+
+2. If QA iteration >= max_qa_iterations: Choose FINISH (prevent infinite testing)
+
+3. Normal flow: designer → frontend_dev → backend_dev → devops → qa_tester → (if bugs) → relevant dev → qa_tester → FINISH
 
 Your task:
 1. Analyze what has been completed
@@ -61,9 +72,12 @@ Respond with JSON containing:
     
     # Call LLM to make routing decision
     try:
+        # Use model from user request
+        model = state.get("request_model", "openai/qwen3-235b-a22b-2507")
+        
         response_text = await llm_router.generate_text(
             prompt="Analyze the current state and decide the next step.",
-            model="gpt-4",
+            model=model,
             temperature=0.3,
             max_tokens=500,
             system_prompt=system_prompt
@@ -122,6 +136,9 @@ async def _prepare_final_response(state: Dict[str, Any]) -> str:
     system_prompt = """You are a Project Manager presenting completed work to a client.
 Summarize the completed tasks and deliverables in a clear, professional manner."""
     
+    # Use model from user request
+    model = state.get("request_model", "openai/qwen3-235b-a22b-2507")
+    
     summary_prompt = f"""
 Project Request: {state.get('user_request', 'N/A')}
 
@@ -141,7 +158,7 @@ Create a concise summary of what was delivered and how to use it.
     try:
         response = await llm_router.generate_text(
             prompt=summary_prompt,
-            model="gpt-4",
+            model=model,
             temperature=0.7,
             max_tokens=800,
             system_prompt=system_prompt

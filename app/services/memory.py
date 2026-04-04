@@ -21,6 +21,13 @@ class MemoryService:
             logger.info("Initializing Mem0 client...")
             
             # Configure Mem0 with Qdrant vector store
+            # CRITICAL: Mem0 v0.0.8+ uses environment variable OPENAI_API_KEY
+            import os
+            os.environ["OPENAI_API_KEY"] = settings.openai_api_key
+            if settings.openai_base_url:
+                os.environ["OPENAI_BASE_URL"] = settings.openai_base_url
+                logger.info("Mem0 using custom OpenAI base URL", url=settings.openai_base_url)
+            
             config = {
                 "vector_store": {
                     "provider": "qdrant",
@@ -33,8 +40,7 @@ class MemoryService:
                 "llm": {
                     "provider": "openai",
                     "config": {
-                        "model": "gpt-4",
-                        "api_key": settings.openai_api_key,
+                        "model": "openai/qwen3-235b-a22b-2507",
                         "temperature": 0.1,
                     }
                 },
@@ -42,7 +48,6 @@ class MemoryService:
                     "provider": "openai",
                     "config": {
                         "model": "text-embedding-3-small",
-                        "api_key": settings.openai_api_key,
                     }
                 }
             }
@@ -72,8 +77,15 @@ class MemoryService:
         try:
             client = self._get_client()
             
+            # Convert messages to a single string for Mem0
+            conversation_text = "\n".join([
+                f"{msg['role']}: {msg['content']}" 
+                for msg in messages
+            ])
+            
+            # Mem0 uses 'data' parameter (string)
             result = client.add(
-                messages=messages,
+                data=conversation_text,
                 user_id=user_id,
                 metadata=metadata or {}
             )
@@ -89,7 +101,8 @@ class MemoryService:
         
         except Exception as e:
             logger.error("Failed to add memory", error=str(e), user_id=user_id)
-            raise
+            # Don't raise - memory storage is not critical
+            return {}
     
     async def search_memory(
         self,

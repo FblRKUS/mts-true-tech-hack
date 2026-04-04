@@ -154,6 +154,9 @@ async def _test_workspace(workspace: Dict[str, str]) -> Dict[str, Any]:
         }
     
     try:
+        # === E2B ЗАПУСК! ===
+        logger.info("🚀 E2B ЗАПУСК!", files=list(workspace.keys()), entrypoint=entrypoint, language=language)
+        
         # Run project in E2B (dependencies will be auto-installed)
         result = await e2b_runner.run_project(
             files=workspace,
@@ -162,12 +165,28 @@ async def _test_workspace(workspace: Dict[str, str]) -> Dict[str, Any]:
             timeout=60
         )
         
-        logger.info(
-            "E2B execution result",
-            success=result.get("success"),
-            exit_code=result.get("exit_code"),
-            stderr_length=len(result.get("stderr", ""))
-        )
+        # === ДЕТАЛЬНЫЙ ВЫВОД ЛОГОВ E2B В КОНСОЛЬ ===
+        logger.info("=" * 60)
+        logger.info("================ E2B СТАТУС ================")
+        logger.info(f"Код возврата (Exit Code): {result.get('exit_code')}")
+        
+        stdout = result.get('stdout', '')
+        if stdout:
+            logger.info("📄 STDOUT (Успешный вывод):")
+            logger.info(stdout)
+        else:
+            logger.info("📄 STDOUT пуст.")
+        
+        stderr = result.get('stderr', '')
+        if stderr:
+            logger.error("❌ STDERR (Ошибки):")
+            logger.error(stderr)
+        else:
+            logger.info("✅ STDERR пуст (нет ошибок)")
+        
+        logger.info("============================================")
+        logger.info("=" * 60)
+        # === КОНЕЦ БЛОКА ЛОГИРОВАНИЯ ===
         
         return result
     
@@ -253,9 +272,12 @@ Do NOT just repeat the error - provide the solution.
 """
     
     try:
+        # Use model from user request
+        model = state.get("request_model", "openai/qwen3-235b-a22b-2507")
+        
         response_text = await llm_router.generate_text(
             prompt=prompt,
-            model="gpt-4",
+            model=model,
             temperature=0.2,  # Low temperature for precise analysis
             max_tokens=1500,
             system_prompt=system_prompt

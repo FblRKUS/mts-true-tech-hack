@@ -1,8 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from langgraph.checkpoint.postgres import PostgresSaver
-from psycopg_pool import AsyncConnectionPool
+from langgraph.checkpoint.memory import MemorySaver
 from app.core.config import settings
 import structlog
 
@@ -27,31 +26,17 @@ class DatabaseManager:
             expire_on_commit=False
         )
         
-        # PostgresSaver pool for LangGraph checkpointing (uses psycopg sync API)
-        self._checkpointer_pool: AsyncConnectionPool | None = None
-        self._checkpointer: PostgresSaver | None = None
+        # MemorySaver for LangGraph checkpointing (in-memory for now)
+        self._checkpointer: MemorySaver | None = None
     
-    async def initialize_checkpointer(self) -> PostgresSaver:
-        """Initialize PostgresSaver with connection pool for LangGraph."""
+    async def initialize_checkpointer(self) -> MemorySaver:
+        """Initialize MemorySaver for LangGraph."""
         if self._checkpointer is None:
             logger.info("Initializing LangGraph checkpointer...")
             
-            # Create async connection pool for psycopg
-            self._checkpointer_pool = AsyncConnectionPool(
-                conninfo=settings.database_url,
-                min_size=2,
-                max_size=10,
-                kwargs={"autocommit": True, "prepare_threshold": 0}
-            )
+            # Create MemorySaver instance
+            self._checkpointer = MemorySaver()
             
-            # Wait for pool to open
-            await self._checkpointer_pool.__aenter__()
-            
-            # Create PostgresSaver instance
-            self._checkpointer = PostgresSaver(self._checkpointer_pool)
-            
-            # Setup tables
-            await self._checkpointer.setup()
             logger.info("LangGraph checkpointer initialized successfully")
         
         return self._checkpointer
@@ -71,8 +56,7 @@ class DatabaseManager:
         """Close all database connections."""
         logger.info("Closing database connections...")
         
-        if self._checkpointer_pool:
-            await self._checkpointer_pool.__aexit__(None, None, None)
+        # MemorySaver doesn't need explicit closing
         
         await self.engine.dispose()
         logger.info("Database connections closed")

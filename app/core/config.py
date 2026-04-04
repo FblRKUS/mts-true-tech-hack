@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     
     # OpenAI API
     openai_api_key: str
+    openai_base_url: Optional[str] = None  # Custom OpenAI-compatible provider
     
     # LiteLLM
     litellm_master_key: str

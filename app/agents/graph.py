@@ -27,6 +27,7 @@ class AgentGraphState(TypedDict):
     thread_id: str
     user_id: str
     memory_context: str
+    request_model: str  # Model requested by user
     
     # Routing
     next_agent: str
@@ -147,9 +148,10 @@ def create_initial_state(
     user_request: str,
     user_id: str,
     thread_id: str,
+    request_model: str = "openai/qwen3-235b-a22b-2507",
     messages: list = None,
     memory_context: str = ""
-) -> AgentGraphState:
+) -> dict:
     """
     Create initial state for graph execution.
     
@@ -157,31 +159,33 @@ def create_initial_state(
         user_request: User's request text
         user_id: User identifier
         thread_id: Conversation thread ID
+        request_model: Model requested by user
         messages: Initial messages (optional)
         memory_context: Retrieved memory context
     
     Returns:
-        Initialized AgentGraphState
+        Initialized state dict (NOT AgentGraphState - that's for typing only)
     """
-    return AgentGraphState(
-        messages=messages or [],
-        user_request=user_request,
-        thread_id=thread_id,
-        user_id=user_id,
-        memory_context=memory_context,
-        next_agent="",
-        current_agent="",
-        current_task_description="",
-        supervisor_reasoning="",
-        task_plan=[],
-        completed_tasks=[],
-        design_artifacts={},
-        frontend_code={},
-        backend_code={},
-        devops_configs={},
-        qa_iteration=0,
-        qa_feedback=[],
-        e2b_test_results={},
-        is_completed=False,
-        final_response=""
-    )
+    return {
+        "messages": messages or [],
+        "user_request": user_request,
+        "thread_id": thread_id,
+        "user_id": user_id,
+        "memory_context": memory_context,
+        "request_model": request_model,
+        "next_agent": "",
+        "current_agent": "",
+        "current_task_description": "",
+        "supervisor_reasoning": "",
+        "task_plan": [],
+        "completed_tasks": [],
+        "design_artifacts": {},
+        "frontend_code": {},
+        "backend_code": {},
+        "devops_configs": {},
+        "qa_iteration": 0,
+        "qa_feedback": [],
+        "e2b_test_results": {},
+        "is_completed": False,
+        "final_response": ""
+    }

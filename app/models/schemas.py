@@ -1,19 +1,18 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any, Literal
-from datetime import datetime
+from typing import List, Optional, Dict, Any, Literal, Union
 
 
 class ChatMessage(BaseModel):
-    """Single message in chat conversation (OpenAI format)."""
+    """Single message in chat conversation (OpenAI format with Vision support)."""
     role: Literal["system", "user", "assistant", "function"]
-    content: str
+    content: Union[str, List[Dict[str, Any]]]  # Support multimodal: text OR array of content parts
     name: Optional[str] = None
     function_call: Optional[Dict[str, Any]] = None
 
 
 class ChatCompletionRequest(BaseModel):
     """Request body for /v1/chat/completions endpoint."""
-    model: str = Field(default="gpt-4", description="Model identifier")
+    model: str = Field(default="openai/qwen3-235b-a22b-2507", description="Model identifier")
     messages: List[ChatMessage]
     temperature: Optional[float] = Field(default=0.7, ge=0.0, le=2.0)
     max_tokens: Optional[int] = Field(default=None, ge=1)

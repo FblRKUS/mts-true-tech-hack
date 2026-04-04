@@ -91,9 +91,12 @@ Include ALL dependencies in requirements.txt.
 """
     
     try:
+        # Use model from user request
+        model = state.get("request_model", "openai/qwen3-235b-a22b-2507")
+        
         response_text = await llm_router.generate_text(
             prompt=prompt,
-            model="gpt-4",
+            model=model,
             temperature=0.5,
             max_tokens=3000,
             system_prompt=system_prompt
@@ -123,7 +126,8 @@ Include ALL dependencies in requirements.txt.
             "workspace": updated_workspace,
             "backend_code": backend_files,  # Keep for compatibility
             "completed_tasks": completed_tasks,
-            "current_agent": "backend_dev"
+            "current_agent": "backend_dev",
+            "qa_feedback": []  # CRITICAL: Clear QA feedback after applying patches
         }
     
     except Exception as e:
@@ -152,5 +156,6 @@ def read_root():
             "workspace": updated_workspace,
             "backend_code": fallback_code,
             "completed_tasks": state.get("completed_tasks", []) + ["Backend Development (fallback)"],
-            "current_agent": "backend_dev"
+            "current_agent": "backend_dev",
+            "qa_feedback": []  # CRITICAL: Clear QA feedback
         }

@@ -71,17 +71,8 @@ class E2BRunner:
     ) -> Dict[str, Any]:
         """Synchronous E2B execution (called in thread pool)."""
         
-        # Map language to E2B sandbox template
-        template_map = {
-            "python": "Python3",
-            "javascript": "Node",
-            "typescript": "Node",
-            "bash": "Bash"
-        }
-        
-        template = template_map.get(language.lower(), "Python3")
-        
-        with Sandbox(template=template, api_key=self.api_key, timeout=timeout) as sandbox:
+        # E2B SDK uses default base environment (no template needed)
+        with Sandbox(api_key=self.api_key, timeout=timeout) as sandbox:
             try:
                 # Execute code
                 execution = sandbox.run_code(code)
@@ -162,15 +153,8 @@ class E2BRunner:
         Critical: Installs dependencies before running code to prevent ModuleNotFoundError.
         """
         
-        template_map = {
-            "python": "Python3",
-            "javascript": "Node",
-            "typescript": "Node",
-        }
-        
-        template = template_map.get(language.lower(), "Python3")
-        
-        with Sandbox(template=template, api_key=self.api_key, timeout=timeout) as sandbox:
+        # E2B SDK uses default base environment (no template needed)
+        with Sandbox(api_key=self.api_key, timeout=timeout) as sandbox:
             try:
                 # Write all files to sandbox
                 for filepath, content in files.items():
