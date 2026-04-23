@@ -1,80 +1,121 @@
-
 services:
-  app:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${GPTHUB_POSTGRES_DB}
+      POSTGRES_USER: ${GPTHUB_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${GPTHUB_POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${GPTHUB_POSTGRES_USER} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "5432"
+
+  qdrant:
+    image: qdrant/qdrant:v1.11.4
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/6333'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "6333"
+
+  backend:
     build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: mts_agentic_app
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
+      context: ./apps/gpthub-api
+    restart: unless-stopped
+    environment:
+      BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS}
+      MWS_GPT_BASE_URL: ${MWS_GPT_BASE_URL}
+      MWS_GPT_API_KEY: ${MWS_GPT_API_KEY}
+      MWS_STUB_MODE: ${MWS_STUB_MODE}
+      MWS_DEFAULT_MODEL: ${MWS_DEFAULT_MODEL}
+      E2B_API_KEY: ${E2B_API_KEY}
+      DATABASE_URL: ${GPTHUB_DATABASE_URL}
+      MEMORY_VECTOR_BACKEND: ${MEMORY_VECTOR_BACKEND}
+      MEMORY_VECTOR_COLLECTION: ${MEMORY_VECTOR_COLLECTION}
+      QDRANT_URL: ${QDRANT_URL}
+    depends_on:
+      gpthub-db-init:
+        condition: service_completed_successfully
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -H \"Authorization: Bearer ${MWS_GPT_API_KEY}\" http://localhost:8000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "8000"
+
+  gpthub-db-init:
+    build:
+      context: ./apps/gpthub-api
+    restart: "no"
+    environment:
+      DATABASE_URL: ${GPTHUB_DATABASE_URL}
     depends_on:
       postgres:
         condition: service_healthy
-      qdrant:
-        condition: service_started
-    volumes:
-      - ./app:/app/app
-      - ./logs:/app/logs
-    restart: unless-stopped
-    networks:
-      - mts_network
+    command: ["/bin/sh", "/app/app/scripts/db_init.sh"]
 
-  postgres:
-    image: postgres:16-alpine
-    container_name: mts_postgres
+  openwebui-db-init:
+    build:
+      context: ./apps/openwebui
+      dockerfile: backend/scripts/openwebui-db-init.Dockerfile
+    restart: "no"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-mts_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mts_password}
-      POSTGRES_DB: ${POSTGRES_DB:-mts_agentic_db}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mts_user} -d ${POSTGRES_DB:-mts_agentic_db}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - mts_network
-
-  qdrant:
-    image: qdrant/qdrant:latest
-    container_name: mts_qdrant
-    ports:
-      - "6333:6333"
-      - "6334:6334"
-    volumes:
-      - qdrant_data:/qdrant/storage
-    environment:
-      QDRANT__SERVICE__GRPC_PORT: 6334
-    networks:
-      - mts_network
-
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: mts_open_webui
-    ports:
-      - "3000:8080"
-    environment:
-      OPENAI_API_BASE_URL: http://app:8000/v1
-      OPENAI_API_KEY: dummy-key
-      WEBUI_AUTH: "False"
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: ${GPTHUB_POSTGRES_USER}
+      PGPASSWORD: ${GPTHUB_POSTGRES_PASSWORD}
+      PGDATABASE: postgres
+      OPENWEBUI_POSTGRES_DB: ${OPENWEBUI_POSTGRES_DB}
+      OPENWEBUI_POSTGRES_USER: ${OPENWEBUI_POSTGRES_USER}
+      OPENWEBUI_POSTGRES_PASSWORD: ${OPENWEBUI_POSTGRES_PASSWORD}
     depends_on:
-      - app
+      postgres:
+        condition: service_healthy
+
+  openwebui:
+    build:
+      context: ./apps/openwebui
+      args:
+        VITE_GPTHUB_FORK_INFO: ${VITE_GPTHUB_FORK_INFO}
+    user: "0:0"
     restart: unless-stopped
+    environment:
+      DATABASE_URL: ${OPENWEBUI_DATABASE_URL}
+      WEBUI_SECRET_KEY: ${OPENWEBUI_SECRET_KEY}
+      WEBUI_URL: ${OPENWEBUI_WEBUI_URL}
+      WEBUI_ADMIN_EMAIL: ${OPENWEBUI_ADMIN_EMAIL}
+      WEBUI_ADMIN_PASSWORD: ${OPENWEBUI_ADMIN_PASSWORD}
+      ENABLE_SIGNUP: ${OPENWEBUI_ENABLE_SIGNUP}
+      GPTHUB_API_URL: ${OPENWEBUI_GPTHUB_API_URL}
+      GPTHUB_AUTO_BOOTSTRAP_OPENAI: ${OPENWEBUI_GPTHUB_AUTO_BOOTSTRAP_OPENAI}
+      OPENAI_API_TITLE: ${OPENWEBUI_OPENAI_API_TITLE}
+      OPENAI_API_BASE_URL: ${OPENWEBUI_OPENAI_API_BASE_URL}
+      OPENAI_API_KEY: ${OPENWEBUI_OPENAI_API_KEY}
+    depends_on:
+      backend:
+        condition: service_healthy
+      openwebui-db-init:
+        condition: service_completed_successfully
     volumes:
-      - open_webui_data:/app/backend/data
-    networks:
-      - mts_network
+      - openwebui_data:/app/backend/data
+    expose:
+      - "8080"
 
 volumes:
-  postgres_data:
+  pg_data:
+  openwebui_data:
   qdrant_data:
-  open_webui_data:
-
-networks:
-  mts_network:
-    driver: bridge

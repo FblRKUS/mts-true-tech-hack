@@ -1,0 +1,16 @@
+services:
+  postgres:
+    ports:
+      - "${DB_EXTERNAL_PORT:-5433}:5432"
+
+  qdrant:
+    ports:
+      - "${QDRANT_EXTERNAL_PORT:-6333}:6333"
+
+  backend:
+    ports:
+      - "${BACKEND_EXTERNAL_PORT:-8000}:8000"
+
+  openwebui:
+    ports:
+      - "${OPENWEBUI_EXTERNAL_PORT:-3000}:8080"

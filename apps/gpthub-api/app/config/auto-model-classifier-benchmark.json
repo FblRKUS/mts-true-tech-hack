@@ -1,0 +1,407 @@
+{
+  "version": 3,
+  "items": [
+    {
+      "question": "Напиши функцию на Python для сортировки списка словарей по полю age.",
+      "label": "CODING"
+    },
+    {
+      "question": "Fix this bug in TypeScript: Cannot read properties of undefined in renderUserCard.",
+      "label": "CODING"
+    },
+    {
+      "question": "Сделай SQL-запрос для топ-10 клиентов по выручке за квартал.",
+      "label": "CODING"
+    },
+    {
+      "question": "Привет! Объясни простыми словами, что такое кеш.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "What does the word \"latency\" mean in simple terms?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Подскажи, как лучше организовать рабочий день.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Сгенерируй изображение киберпанк города ночью в неоне.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Create an image of a minimalist logo for a coffee brand.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Нарисуй постер в стиле ретро-футуризм для музыкального фестиваля.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Сравни два подхода к хранению сессий и обоснуй выбор.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Think step by step and estimate trade-offs between SQL and NoSQL.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Построй стратегию релиза продукта с ограниченным бюджетом.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Посмотри на фото и скажи, что на нем изображено.",
+      "label": "VISION"
+    },
+    {
+      "question": "Extract text from this screenshot and summarize key points.",
+      "label": "VISION"
+    },
+    {
+      "question": "Распознай текст на чеке и выдели итоговую сумму.",
+      "label": "VISION"
+    }
+  ],
+  "disabled_items": [
+    {
+      "question": "Refactor this React component to use hooks and memoization.",
+      "label": "CODING"
+    },
+    {
+      "question": "Почини Dockerfile, чтобы сборка не падала на этапе npm ci.",
+      "label": "CODING"
+    },
+    {
+      "question": "Write unit tests for this FastAPI endpoint with pytest.",
+      "label": "CODING"
+    },
+    {
+      "question": "Добавь миграцию Alembic для новой таблицы audit_logs.",
+      "label": "CODING"
+    },
+    {
+      "question": "Implement retry logic with exponential backoff in JavaScript.",
+      "label": "CODING"
+    },
+    {
+      "question": "Исправь race condition в обработчике очереди задач.",
+      "label": "CODING"
+    },
+    {
+      "question": "Convert this synchronous Python code to async/await.",
+      "label": "CODING"
+    },
+    {
+      "question": "Оптимизируй медленный endpoint, сейчас p95 больше 2 секунд.",
+      "label": "CODING"
+    },
+    {
+      "question": "Build a REST API for CRUD operations on tasks.",
+      "label": "CODING"
+    },
+    {
+      "question": "Напиши regex для валидации email и телефона.",
+      "label": "CODING"
+    },
+    {
+      "question": "Debug failing CI pipeline in GitHub Actions.",
+      "label": "CODING"
+    },
+    {
+      "question": "Сделай компонент таблицы с пагинацией и сортировкой.",
+      "label": "CODING"
+    },
+    {
+      "question": "Implement JWT auth middleware in Express.",
+      "label": "CODING"
+    },
+    {
+      "question": "Покажи, как вынести бизнес-логику в сервисный слой.",
+      "label": "CODING"
+    },
+    {
+      "question": "Add Redis caching for this endpoint.",
+      "label": "CODING"
+    },
+    {
+      "question": "Перепиши этот скрипт bash на Python.",
+      "label": "CODING"
+    },
+    {
+      "question": "Create a SQL index strategy for this query pattern.",
+      "label": "CODING"
+    },
+    {
+      "question": "Give me a short summary of what Kubernetes is.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Что означает термин \"дедлайн\"?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "How can I improve focus while studying?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Объясни разницу между браузером и поисковиком.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Suggest 5 book recommendations for beginners in product management.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Что такое API простыми словами?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "How to write a polite follow-up email?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Расскажи кратко, что такое SQL.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "What are good habits for healthy sleep?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Как вежливо отказать в встрече?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Explain the difference between RAM and storage.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Что такое двухфакторная аутентификация?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Suggest a simple weekly workout plan for beginners.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Чем отличается HTTP от HTTPS?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "How to prepare for a job interview in 3 days?",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Объясни, зачем нужны резервные копии данных.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Give me tips for speaking confidently at meetings.",
+      "label": "GENERAL"
+    },
+    {
+      "question": "Generate a watercolor illustration of a mountain village at sunrise.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Сделай баннер для лендинга про онлайн-курсы по аналитике.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Create a photorealistic image of a red vintage car in rain.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Сгенерируй обложку подкаста в flat-стиле.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Design a mascot image for a fintech app.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Сделай иллюстрацию кота-программиста за ноутбуком.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Generate isometric illustration of cloud infrastructure.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Создай концепт-арт космической станции у кольца Сатурна.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Create social media cover image for a startup launch.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Нарисуй иконку приложения заметок в стиле glassmorphism.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Generate a cinematic poster for a detective movie.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Сделай визуал упаковки для органического чая.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Create pixel-art sprite sheet for a 2D character.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Сгенерируй фотореалистичный интерьер скандинавской гостиной.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Generate a fantasy landscape with floating islands.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Сделай mockup экрана мобильного приложения на фоне.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Create black-and-white line art for coloring page.",
+      "label": "IMAGE_GENERATION"
+    },
+    {
+      "question": "Analyze risks of migrating monolith to microservices.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Объясни, почему один вариант архитектуры лучше другого в этом кейсе.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Reason about algorithmic complexity for these two solutions.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Сделай поэтапный план расследования инцидента в проде.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Evaluate pros and cons of eventual consistency for this system.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Реши логическую задачу с ограничениями и обоснованием.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Provide a decision matrix for choosing cloud provider.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Проанализируй причины падения конверсии и гипотезы.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Derive a step-by-step proof for the given statement.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Сравни варианты ценообразования и выбери оптимальный.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Assess trade-offs of batch vs stream processing.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Обоснуй выбор структуры команды под новую инициативу.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Perform root-cause analysis from this incident timeline.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Сформулируй критерии успеха и метрики для эксперимента.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Compare three hiring strategies and recommend one.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Разберись в конфликтующих требованиях и предложи компромисс.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Estimate impact of latency reduction from 300ms to 120ms.",
+      "label": "REASONING"
+    },
+    {
+      "question": "Analyze this chart image and describe the trend.",
+      "label": "VISION"
+    },
+    {
+      "question": "Определи, какие объекты видны на фотографии улицы.",
+      "label": "VISION"
+    },
+    {
+      "question": "Read the table from the image and return CSV.",
+      "label": "VISION"
+    },
+    {
+      "question": "Проверь скриншот интерфейса на явные UI-проблемы.",
+      "label": "VISION"
+    },
+    {
+      "question": "Describe what is happening in this security camera frame.",
+      "label": "VISION"
+    },
+    {
+      "question": "Извлеки серийный номер с фото устройства.",
+      "label": "VISION"
+    },
+    {
+      "question": "Identify logos visible in this image.",
+      "label": "VISION"
+    },
+    {
+      "question": "Скажи, есть ли на фото человек в красной одежде.",
+      "label": "VISION"
+    },
+    {
+      "question": "Transcribe handwritten text from the provided photo.",
+      "label": "VISION"
+    },
+    {
+      "question": "Опиши структуру диаграммы на изображении.",
+      "label": "VISION"
+    },
+    {
+      "question": "Detect if the uploaded image contains a QR code.",
+      "label": "VISION"
+    },
+    {
+      "question": "Найди дату и номер документа на фото паспорта.",
+      "label": "VISION"
+    },
+    {
+      "question": "Explain this meme image in plain text.",
+      "label": "VISION"
+    },
+    {
+      "question": "Распознай заголовки колонок в таблице на скрине.",
+      "label": "VISION"
+    },
+    {
+      "question": "Identify product names in this shelf photo.",
+      "label": "VISION"
+    },
+    {
+      "question": "Определи, насколько четкое это изображение (blur/no blur).",
+      "label": "VISION"
+    },
+    {
+      "question": "Extract bullet points from this slide screenshot.",
+      "label": "VISION"
+    }
+  ]
+}

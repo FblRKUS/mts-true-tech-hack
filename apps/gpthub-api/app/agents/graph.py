@@ -1,0 +1,192 @@
+from typing import Any, Annotated, TypedDict, Sequence
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+from app.core.database import db_manager
+from app.agents.supervisor import supervisor_node, route_supervisor
+from app.agents.nodes import (
+    designer_node,
+    frontend_dev_node,
+    backend_dev_node,
+    devops_node,
+    qa_tester_node
+)
+import asyncio
+import structlog
+
+logger = structlog.get_logger(__name__)
+
+
+# Define state schema with message accumulation
+class AgentGraphState(TypedDict):
+    """State schema for the multi-agent graph."""
+    
+    # Messages with automatic accumulation
+    messages: Annotated[Sequence[dict], add_messages]
+    
+    # User context
+    user_request: str
+    thread_id: str
+    user_id: str
+    memory_context: str
+    request_model: str  # Model requested by user
+    loop_trace_id: str
+    task_profile: str
+    
+    # Routing
+    next_agent: str
+    current_agent: str
+    current_task_description: str
+    supervisor_reasoning: str
+    supervisor_reason_code: str
+    
+    # Task management
+    task_plan: list[str]
+    completed_tasks: list[str]
+
+    # Shared file workspace — agents write code here instead of into messages
+    workspace: dict[str, str]
+
+    # Generated artifacts
+    design_artifacts: dict
+    frontend_code: dict
+    backend_code: dict
+    devops_configs: dict
+    
+    # QA loop
+    qa_iteration: int
+    qa_feedback: list[dict[str, Any]]
+    e2b_test_results: dict
+    
+    # Output
+    is_completed: bool
+    final_response: str
+    agent_error: dict[str, Any]
+
+
+# Global graph instance (compiled once) and a lock to prevent concurrent init
+_compiled_graph = None
+_graph_lock = asyncio.Lock()
+
+
+async def get_agent_graph():
+    """
+    Get or create the compiled LangGraph.
+    
+    Returns compiled StateGraph with checkpointer.
+    Uses an asyncio.Lock to guarantee only one graph is built even under
+    concurrent requests.
+    """
+    global _compiled_graph
+
+    # Fast path — already built
+    if _compiled_graph is not None:
+        return _compiled_graph
+
+    async with _graph_lock:
+        # Re-check inside the lock in case another coroutine beat us here
+        if _compiled_graph is not None:
+            return _compiled_graph
+
+        logger.info("Building LangGraph agent graph...")
+
+        # Initialize checkpointer
+        checkpointer = await db_manager.initialize_checkpointer()
+
+        # Create graph with typed state
+        graph = StateGraph(AgentGraphState)
+
+        # Add all nodes
+        graph.add_node("supervisor", supervisor_node)
+        graph.add_node("designer", designer_node)
+        graph.add_node("frontend_dev", frontend_dev_node)
+        graph.add_node("backend_dev", backend_dev_node)
+        graph.add_node("devops", devops_node)
+        graph.add_node("qa_tester", qa_tester_node)
+
+        # Set entry point (supervisor decides first action)
+        graph.set_entry_point("supervisor")
+
+        # Supervisor routes to workers or END
+        graph.add_conditional_edges(
+            "supervisor",
+            route_supervisor,
+            {
+                "designer": "designer",
+                "frontend_dev": "frontend_dev",
+                "backend_dev": "backend_dev",
+                "devops": "devops",
+                "qa_tester": "qa_tester",
+                "end": END
+            }
+        )
+
+        # All workers return to supervisor for next decision
+        graph.add_edge("designer", "supervisor")
+        graph.add_edge("frontend_dev", "supervisor")
+        graph.add_edge("backend_dev", "supervisor")
+        graph.add_edge("devops", "supervisor")
+        graph.add_edge("qa_tester", "supervisor")
+
+        # Compile graph with checkpointer for persistence
+        _compiled_graph = graph.compile(checkpointer=checkpointer)
+
+        logger.info(
+            "LangGraph compiled successfully",
+            num_nodes=6,
+            checkpointer=type(checkpointer).__name__
+        )
+
+        return _compiled_graph
+
+
+# Initialize default state values
+def create_initial_state(
+    user_request: str,
+    user_id: str,
+    thread_id: str,
+    request_model: str = "autoselect",
+    messages: list = None,
+    memory_context: str = ""
+) -> dict:
+    """
+    Create initial state for graph execution.
+    
+    Args:
+        user_request: User's request text
+        user_id: User identifier
+        thread_id: Conversation thread ID
+        request_model: Model requested by user
+        messages: Initial messages (optional)
+        memory_context: Retrieved memory context
+    
+    Returns:
+        Initialized state dict (NOT AgentGraphState - that's for typing only)
+    """
+    return {
+        "messages": messages or [],
+        "user_request": user_request,
+        "thread_id": thread_id,
+        "user_id": user_id,
+        "memory_context": memory_context,
+        "request_model": request_model,
+        "loop_trace_id": thread_id,
+        "task_profile": "",
+        "next_agent": "",
+        "current_agent": "",
+        "current_task_description": "",
+        "supervisor_reasoning": "",
+        "supervisor_reason_code": "",
+        "task_plan": [],
+        "completed_tasks": [],
+        "workspace": {},
+        "design_artifacts": {},
+        "frontend_code": {},
+        "backend_code": {},
+        "devops_configs": {},
+        "qa_iteration": 0,
+        "qa_feedback": [],
+        "e2b_test_results": {},
+        "is_completed": False,
+        "final_response": "",
+        "agent_error": {},
+    }

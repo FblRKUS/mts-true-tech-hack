@@ -1,0 +1,99 @@
+---
+sidebar_position: 1600
+title: "🤝 Contributing"
+---
+
+# 🤝 Contributing
+
+**Help build the AI interface everyone deserves.**
+
+Open WebUI is an independent project built and maintained by a small, dedicated core team. Whether you test dev builds, fix bugs, improve docs, or translate the UI, every contribution makes the project better for thousands of users. This page explains how to get involved and what to expect.
+
+---
+
+## Code of Conduct
+
+All contributors and community participants must follow the **[Code of Conduct](https://github.com/open-webui/open-webui/blob/main/CODE_OF_CONDUCT.md)**. We operate under a **zero-tolerance policy**: disrespectful, demanding, or hostile behavior results in immediate action without prior warning.
+
+This project is built by volunteers in their free time. Treat every interaction with professionalism and respect.
+
+---
+
+## Ways to Contribute
+
+### Test the development branch
+
+One of the most valuable contributions requires no code at all. Run the dev branch, use it daily, and report what breaks.
+
+```bash
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:dev
+```
+
+The dev branch moves fast, so **pull updates regularly**. If Docker is not your preference, follow the [Developing Open WebUI](/getting-started/advanced-topics/development) instead.
+
+Report issues on [GitHub](https://github.com/open-webui/open-webui/issues) with clear reproduction steps. We cannot deliver high-quality releases without community testing.
+
+### Submit code
+
+We welcome pull requests. Before submitting one:
+
+1. **Open a discussion first.** Propose your idea [here](https://github.com/open-webui/open-webui/discussions/new/choose) so the team can align on approach before you write code.
+2. **Follow existing conventions.** Match the project's coding standards, naming patterns, and architecture.
+3. **Keep PRs atomic.** Each pull request should address a single objective. If scope grows, split it into smaller, logically independent PRs.
+4. **Avoid new external dependencies.** Do not add libraries or frameworks without prior discussion. We aim to stay framework-agnostic and implement functionality ourselves when practical.
+5. **Include tests.** Cover new features with tests and update documentation as needed.
+6. **Write clear commit messages.** Descriptive messages make review and history tracking easier.
+
+### Improve documentation
+
+Help make Open WebUI more accessible by improving docs, writing tutorials, or creating setup guides. Documentation lives in the [docs repository](https://github.com/open-webui/docs).
+
+### Translate the UI
+
+Open WebUI uses JSON translation files in `src/lib/i18n/locales`. Each subdirectory is named with an [ISO 639 language code](http://www.lingoes.net/en/translator/langcode.htm) (e.g., `en-US`, `fr-FR`).
+
+To add a new language:
+
+1. Create a new directory under `src/lib/i18n/locales` named with the appropriate language code
+2. Copy the `en-US` translation files into the new directory
+3. Translate the string values in each JSON file while preserving the object structure
+4. Register the language in `src/lib/i18n/locales/languages.json`
+
+### Improve accessibility
+
+Accessibility is a core part of good design. When contributing UI changes:
+
+| Principle | What to do |
+|-----------|-----------|
+| **Semantic HTML** | Use `<button>`, `<label>`, `<nav>`, and other semantic elements instead of generic `<div>` wrappers |
+| **Keyboard navigation** | Ensure all interactive elements work without a mouse |
+| **ARIA labels** | Add [ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA) roles and labels where semantic HTML alone is insufficient |
+| **Color contrast** | Verify contrast ratios with [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) |
+| **Alt text** | Provide descriptive `alt` for meaningful images; use `alt=""` for decorative ones |
+
+Test your changes with Lighthouse or your browser's accessibility tools.
+
+---
+
+## Reporting Issues
+
+Check the [Issues tab](https://github.com/open-webui/open-webui/issues) before opening a new one. When filing:
+
+- **Use the issue template.** Issues that do not follow the template or lack requested information will be closed.
+- **Include reproduction steps.** Describe what you did, what you expected, and what actually happened.
+- **Be specific.** Vague reports ("it doesn't work") cannot be investigated effectively.
+
+:::warning Scope of support
+Open WebUI supports Docker deployment, but we assume familiarity with Docker fundamentals. Issues related to reverse proxy configuration, container networking, or host OS setup are outside the project's support scope. Refer to the [official Docker documentation](https://docs.docker.com/get-started/overview/) for those topics.
+:::
+
+---
+
+## Get in Touch
+
+| Channel | Link |
+|---------|------|
+| **Discord** | [discord.gg/5rJgQTnV4s](https://discord.gg/5rJgQTnV4s) |
+| **Reddit** | [r/OpenWebUI](https://www.reddit.com/r/OpenWebUI/) |
+| **GitHub Issues** | [open-webui/open-webui/issues](https://github.com/open-webui/open-webui/issues) |
+| **GitHub Discussions** | [open-webui/open-webui/discussions](https://github.com/open-webui/open-webui/discussions) |

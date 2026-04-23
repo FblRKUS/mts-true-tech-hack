@@ -1,0 +1,141 @@
+---
+sidebar_position: 0
+slug: /
+title: 🏡 Home
+hide_title: true
+---
+
+ 
+import { SponsorList } from "@site/src/components/SponsorList";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Open WebUI
+
+**Open WebUI is an [extensible](https://docs.openwebui.com/features/extensibility/plugin/), feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.** It supports **Ollama** and **OpenAI-compatible APIs**, making it a powerful, provider-agnostic solution for both local and cloud-based models.
+
+![Open WebUI Demo](/images/demo.png)
+
+![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
+![GitHub forks](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
+[![Discord](https://img.shields.io/badge/Discord-Open_WebUI-blue?logo=discord&logoColor=white)](https://discord.gg/5rJgQTnV4s)
+
+---
+
+## Quick Start
+
+<Tabs>
+  <TabItem value="docker" label="Docker" default>
+
+```bash
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+
+Then open [http://localhost:3000](http://localhost:3000).
+
+For GPU support, Docker Compose, and more → [Full Docker guide](/getting-started/quick-start)
+
+  </TabItem>
+  <TabItem value="pip" label="pip">
+
+```bash
+pip install open-webui
+open-webui serve
+```
+
+Then open [http://localhost:8080](http://localhost:8080).
+
+  </TabItem>
+  <TabItem value="uv" label="uv">
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
+```
+
+Then open [http://localhost:8080](http://localhost:8080).
+
+  </TabItem>
+  <TabItem value="desktop" label="Desktop">
+
+Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It runs Open WebUI natively on your system without Docker or manual setup.
+
+:::warning Experimental
+The desktop app is a **work in progress** and is not yet stable. For production use, install via **Docker** or **Python**.
+:::
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Getting Started
+
+- [**Quick Start**](/getting-started/quick-start) — Docker, Python, Kubernetes install options
+- [**Connect a Provider**](/getting-started/quick-start/connect-a-provider) — Ollama, OpenAI, Anthropic, vLLM, and more
+- [**Connect an Agent**](/getting-started/quick-start/connect-an-agent) — Hermes Agent, OpenClaw, and other autonomous AI agents
+- [**Updating**](/getting-started/updating) — Keep your instance current
+- [**Development Branch**](/getting-started/quick-start) — Help test the latest changes before stable release
+- [**Advanced Topics**](/getting-started/advanced-topics) — Scaling, logging, and advanced configuration
+
+---
+
+## Explore
+
+- [**Features**](/features) — Discover what Open WebUI can do
+- [**Tutorials**](/tutorials) — Step-by-step guides
+- [**FAQ**](/faq) — Common questions answered
+- [**Troubleshooting**](/troubleshooting) — Fix common issues
+- [**Reference**](/reference) — Environment variables and API details
+
+---
+
+## Enterprise
+
+Need **custom branding**, **SLA support**, or **Long-Term Support (LTS)** versions?
+→ [Learn about Enterprise plans](/enterprise)
+
+---
+
+## Get Involved
+
+- [**Contributing**](/contributing) — Help build Open WebUI
+- [**Development Setup**](/getting-started/advanced-topics/development) — Run the project locally from source
+- [**Discord**](https://discord.gg/5rJgQTnV4s) — Join the community
+- [**GitHub**](https://github.com/open-webui/open-webui) — Report issues, submit PRs
+- [**Careers**](https://careers.openwebui.com/) — Join our team
+
+---
+
+## Sponsors
+
+<SponsorList />
+
+---
+
+## Acknowledgements
+
+<div className="grid gap-4 items-start grid-cols-1 md:grid-cols-3">
+
+  <a href="https://a16z.com/advancing-open-source-ai-through-benchmarks-and-bold-experimentation/" title="A16z Open Source AI Grant 2025" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
+    <div className="max-w-full h-auto">
+      ![A16z](/sponsors/grants/a16z.png)
+    </div>
+    <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>A16z Open Source AI Grant 2025</span>
+  </a>
+
+  <a href="https://builders.mozilla.org/" title="Mozilla Builders 2024" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
+    <div className="max-w-full h-auto">
+      ![Mozilla](/sponsors/grants/mozilla.png)
+    </div>
+    <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>Mozilla Builders 2024</span>
+  </a>
+
+  <a href="https://github.com/accelerator" title="GitHub Accelerator 2024" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
+    <div className="max-w-full h-auto">
+      ![GitHub](/sponsors/grants/github.png)
+    </div>
+    <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>GitHub Accelerator 2024</span>
+  </a>
+
+</div>
