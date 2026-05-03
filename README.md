@@ -1,88 +1,136 @@
 # GPTHub Hack 2026
 
-Проект объединяет OpenWebUI и GPTHub API в одном стенде. OpenWebUI дает интерфейс чата, а GPTHub API отвечает за бизнес-логику, маршрутизацию моделей и кастомные фичи.
+An AI assistant platform that combines a customized **OpenWebUI** frontend with a dedicated **GPTHub API** backend.  
+OpenWebUI provides the user experience, while GPTHub API handles model routing, feature orchestration, and integration logic.
 
-## Что внутри
+## Why this project is portfolio-ready
 
-- `apps/gpthub-api` — основной backend на FastAPI.
-- `apps/openwebui` — локальная копия OpenWebUI для доработок.
-- `docker-compose.yml` — основной compose для деплоя.
-- `docker-compose.override.yml` — локальные порты для разработки.
-- `config/` — общие конфиги и дефолты для автонастройки моделей.
+- End-to-end product architecture: UI, API, persistence, vector storage, and model providers.
+- Real feature surface (not a toy demo): auto model routing, chat memory, media workflows, and workspace automation.
+- Production-style deployment with Docker Compose and health checks.
+- OpenAI-compatible API layer for easier integration with external tools.
 
-## Установка и запуск
+## Repository structure
 
-1. Скопируйте пример окружения:
+- `apps/gpthub-api` — FastAPI backend with routing logic and product features.
+- `apps/openwebui` — local OpenWebUI fork customized for GPTHub integration.
+- `config/` — shared defaults, including auto-model presets.
+- `docker-compose.yml` — main multi-service stack definition.
+- `docker-compose.override.yml` — local development port mapping.
+- `docs/` — internal implementation notes and feature specifications.
+
+## Core architecture
+
+The platform runs as a service monolith with supporting infrastructure:
+
+1. **OpenWebUI** receives user input and renders chat experiences.
+2. **GPTHub API** applies routing policies, feature settings, and business logic.
+3. **PostgreSQL** stores operational data for both GPTHub and OpenWebUI.
+4. **Qdrant** powers vector-backed memory retrieval.
+5. **LLM providers** (MWS GPT and OpenAI-compatible endpoints) execute model calls.
+
+## Feature snapshot
+
+- **Auto/Autoselect routing** with task-type-aware model selection.
+- **Chat memory** with retrieval for long-running conversations.
+- **OpenAI-compatible endpoints** for chat, embeddings, image generation, and audio transcription.
+- **Media gallery** and related chat ingestion flows.
+- **Workspaces + file tree operations** for coding-style task execution.
+- **Runtime feature settings** for controlled behavior toggles.
+
+## Quick start
+
+### 1. Prerequisites
+
+- Docker + Docker Compose
+- A valid model provider key (for non-stub mode)
+
+### 2. Prepare environment
+
 ```bash
 cp .env.example .env
 ```
 
-2. Настройте `.env`.
+Open `.env` and verify at least these values:
 
-Дальше откройте `.env` и проверьте основные значения:
+| Variable | Required | Description |
+| --- | --- | --- |
+| `OPENWEBUI_EXTERNAL_PORT` | Yes | External port for OpenWebUI (default: `3000`) |
+| `BACKEND_EXTERNAL_PORT` | Yes | External port for GPTHub API (default: `8000`) |
+| `MWS_STUB_MODE` | Yes | `true` for local stub behavior, `false` for real provider calls |
+| `MWS_GPT_API_KEY` | Required when `MWS_STUB_MODE=false` | API key for MWS GPT |
+| `E2B_API_KEY` | Required for autopilot scenarios | Enables E2B-backed execution features |
+| `OPENWEBUI_ADMIN_EMAIL` / `OPENWEBUI_ADMIN_PASSWORD` | Yes | Initial OpenWebUI admin credentials |
 
-- **Порт для проверки**: если у вас указан `OPENWEBUI_EXTERNAL_PORT=3000`, открывайте `http://localhost:3000`. У вас может быть другой порт, поэтому всегда смотрите значение `OPENWEBUI_EXTERNAL_PORT`.
-- **MWS GPT**: для работы основной генерации обязательно заполните `MWS_GPT_API_KEY` и поставьте `MWS_STUB_MODE=false`.
-- **Автопилот**: для работы этого функционала обязательно укажите `E2B_API_KEY`. Для тестирования мы предоставили наш ключ в .env.example.
-- **Админ OpenWebUI**: логин и пароль берутся из `OPENWEBUI_ADMIN_EMAIL` и `OPENWEBUI_ADMIN_PASSWORD`.
+### 3. Build and run
 
-Если меняете `OPENWEBUI_EXTERNAL_PORT`, не забудьте открывать именно `http://localhost:{OPENWEBUI_EXTERNAL_PORT}`.
-
-3. Запустите проект:
 ```bash
 docker compose up -d --build
 ```
 
-4. Проверьте статус:
+### 4. Check service status
+
 ```bash
 docker compose ps
 ```
 
-5. Откройте сервисы:
-- OpenWebUI: `http://localhost:3000`
-- GPTHub API: `http://localhost:8000/api/v1/health`
+### 5. Open the platform
 
-## Настройка `.env`
+- OpenWebUI: `http://localhost:${OPENWEBUI_EXTERNAL_PORT:-3000}`
+- GPTHub API root: `http://localhost:${BACKEND_EXTERNAL_PORT:-8000}/`
+- GPTHub API docs: `http://localhost:${BACKEND_EXTERNAL_PORT:-8000}/docs`
 
-Файл `.env` задает поведение всего стенда. Главное здесь — база данных, OpenWebUI и MWS GPT.
+## Operational checks
 
-### База данных
+Quick API availability probe:
 
-- `GPTHUB_POSTGRES_*` — база для GPTHub API.
-- `OPENWEBUI_POSTGRES_*` — база для OpenWebUI.
+```bash
+curl http://localhost:${BACKEND_EXTERNAL_PORT:-8000}/
+```
 
-### MWS GPT
+Expected response:
 
-- `MWS_STUB_MODE=true` — режим заглушек. Удобно для локальной разработки.
-- `MWS_STUB_MODE=false` — включение реального проксирования в MWS GPT.
-- `MWS_GPT_API_KEY` — ключ для реального API.
-- `MWS_DEFAULT_MODEL` — модель по умолчанию для обычных запросов.
+```json
+{"status":"ok","service":"GPTHub API","mode":"stub-ready"}
+```
 
-### OpenWebUI
+If internal API auth is enabled in your environment, send the bearer token in requests to `/api/v1/*` and `/v1/*` routes.
 
-- `OPENWEBUI_SECRET_KEY` — секретный ключ приложения.
-- `OPENWEBUI_ADMIN_EMAIL` / `OPENWEBUI_ADMIN_PASSWORD` — первый админ.
-- `OPENWEBUI_ENABLE_SIGNUP=false` — обычно лучше оставить регистрацию выключенной.
+## Configuration notes
 
-### Связь OpenWebUI и GPTHub
+### GPTHub and OpenWebUI databases
 
-- `OPENWEBUI_GPTHUB_API_URL` — адрес GPTHub API внутри compose.
-- `OPENWEBUI_GPTHUB_AUTO_BOOTSTRAP_OPENAI=true` — автоматически подхватывает GPTHub как OpenAI-compatible провайдер.
-- `OPENWEBUI_OPENAI_API_BASE_URL` / `OPENWEBUI_OPENAI_API_KEY` — отдельный OpenAI-compatible провайдер, если нужен прямой внешний endpoint.
-- `OPENWEBUI_OPENAI_API_TITLE` — имя этого подключения в интерфейсе.
+- `GPTHUB_POSTGRES_*` variables configure GPTHub API storage.
+- `OPENWEBUI_POSTGRES_*` variables configure OpenWebUI storage.
 
-## Что лежит в `config/`
+### OpenWebUI ↔ GPTHub API integration
 
-Папка `config/` нужна для дефолтов и преднастроек, которые проект использует при старте.
+- `OPENWEBUI_GPTHUB_API_URL` points OpenWebUI to GPTHub API inside the Compose network.
+- `OPENWEBUI_GPTHUB_AUTO_BOOTSTRAP_OPENAI=true` auto-registers GPTHub as an OpenAI-compatible provider.
+- `OPENWEBUI_OPENAI_API_BASE_URL` / `OPENWEBUI_OPENAI_API_KEY` can be used for an additional direct provider.
 
-- `config/auto-model-defaults.json` — стартовые значения для автомодели и мультимодала.
-- Здесь задаются базовые модели, например модель для классификации, STT и привязка типов задач к моделям.
-- Если меняете этот файл, лучше потом пересобрать контейнеры, чтобы новые значения точно подхватились.
+### Auto-model defaults
 
-## Коротко о потоке запросов
+`config/auto-model-defaults.json` defines baseline auto-routing defaults such as classifier model and task-type model mapping.  
+After changing defaults, rebuild services to apply updates reliably.
 
-1. Пользователь пишет сообщение в OpenWebUI.
-2. OpenWebUI Backend принимает запрос.
-3. GPTHub API выбирает нужную модель и применяет свою бизнес-логику.
-4. Запрос уходит либо в MWS GPT, либо в другой OpenAI-compatible провайдер.
-5. Ответ возвращается обратно в чат.
+## Request flow (high level)
+
+1. User sends a message in OpenWebUI.
+2. OpenWebUI forwards the request to GPTHub API.
+3. GPTHub API selects routing strategy and target model.
+4. The selected upstream provider processes the request.
+5. The final response is returned to the chat interface.
+
+## Useful commands
+
+```bash
+# Follow logs
+docker compose logs -f
+
+# Restart a single service
+docker compose restart backend
+
+# Stop stack
+docker compose down
+```
